@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>linkup.base &#8212; linkup 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for linkup.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Base functions and classes for linked/joined operations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+
+<span class="n">EmptyMappingFactory</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">MutableMapping</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">MutableMapping</span><span class="p">]]</span>
+<span class="n">BinaryOp</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
+
+<span class="n">Neutral</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="key_aligned_val_op"><a class="viewcode-back" href="../../module_docs/linkup/base.html#linkup.base.key_aligned_val_op">[docs]</a><span class="k">def</span> <span class="nf">key_aligned_val_op</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span>
+    <span class="n">op</span><span class="p">:</span> <span class="n">BinaryOp</span><span class="p">,</span>
+    <span class="n">dflt_val_for_x</span><span class="o">=</span><span class="n">Neutral</span><span class="p">,</span>
+    <span class="n">dflt_val_for_y</span><span class="o">=</span><span class="n">Neutral</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; from operator import add, sub, mul, truediv, and_, or_, xor</span>
+<span class="sd">    &gt;&gt;&gt; x = {&#39;a&#39;: 8, &#39;b&#39;: 4}</span>
+<span class="sd">    &gt;&gt;&gt; y = {&#39;b&#39;: 2, &#39;c&#39;: 1}</span>
+
+<span class="sd">    If no default vals are given, only those keys that are in both mappings will be in the output.</span>
+
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op(x, y, add)</span>
+<span class="sd">    {&#39;b&#39;: 6}</span>
+
+<span class="sd">    If we specify a default for ``x`` then all items of ``y`` can be used.</span>
+
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op(x, y, add, dflt_val_for_x=0)</span>
+<span class="sd">    {&#39;b&#39;: 6, &#39;c&#39;: 1}</span>
+
+<span class="sd">    If we specify a default for ``y`` then all items of ``x`` can be used.</span>
+
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op(x, y, add, dflt_val_for_y=0)</span>
+<span class="sd">    {&#39;a&#39;: 8, &#39;b&#39;: 6}</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v1</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dflt_val_for_y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Neutral</span><span class="p">:</span>
+            <span class="n">result_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+            <span class="c1"># else, don&#39;t include the key</span>
+    <span class="k">if</span> <span class="n">dflt_val_for_x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Neutral</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">result_dict</span><span class="p">):</span>
+            <span class="n">result_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">dflt_val_for_x</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">result_dict</span></div>
+
+
+<div class="viewcode-block" id="key_aligned_val_op_with_forced_defaults"><a class="viewcode-back" href="../../module_docs/linkup/base.html#linkup.base.key_aligned_val_op_with_forced_defaults">[docs]</a><span class="k">def</span> <span class="nf">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span>
+    <span class="n">op</span><span class="p">:</span> <span class="n">BinaryOp</span><span class="p">,</span>
+    <span class="n">dflt_val_for_x</span><span class="p">,</span>
+    <span class="n">dflt_val_for_y</span><span class="p">,</span>
+    <span class="n">empty_mapping_factory</span><span class="p">:</span> <span class="n">EmptyMappingFactory</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Apply an operator to the key-aligned values of two dictionaries, using specified defaults for each dictionary.</span>
+
+<span class="sd">    The output&#39;s keys will be the union of the keys of the input dictionaries.</span>
+
+<span class="sd">    The type of the output will be the type of that is returned by empty_mapping_factory.</span>
+
+<span class="sd">    &gt;&gt;&gt; from operator import add, sub, mul, truediv, and_, or_, xor</span>
+<span class="sd">    &gt;&gt;&gt; x = {&#39;a&#39;: 8, &#39;b&#39;: 4}</span>
+<span class="sd">    &gt;&gt;&gt; y = {&#39;b&#39;: 2, &#39;c&#39;: 1}</span>
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op_with_forced_defaults(x, y, add, 0, 0)</span>
+<span class="sd">    {&#39;a&#39;: 8, &#39;b&#39;: 6, &#39;c&#39;: 1}</span>
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op_with_forced_defaults(x, y, sub, 0, 0)</span>
+<span class="sd">    {&#39;a&#39;: 8, &#39;b&#39;: 2, &#39;c&#39;: -1}</span>
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op_with_forced_defaults(x, y, mul, 1, 1)</span>
+<span class="sd">    {&#39;a&#39;: 8, &#39;b&#39;: 8, &#39;c&#39;: 1}</span>
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op_with_forced_defaults(x, y, truediv, 1, 1)</span>
+<span class="sd">    {&#39;a&#39;: 8.0, &#39;b&#39;: 2.0, &#39;c&#39;: 1.0}</span>
+<span class="sd">    &gt;&gt;&gt; x = {&#39;a&#39;: [8], &#39;b&#39;: [4]}</span>
+<span class="sd">    &gt;&gt;&gt; y = {&#39;b&#39;: [2], &#39;c&#39;: [1]}</span>
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op_with_forced_defaults(x, y, add, [], [])</span>
+<span class="sd">    {&#39;a&#39;: [8], &#39;b&#39;: [4, 2], &#39;c&#39;: [1]}</span>
+<span class="sd">    &gt;&gt;&gt; x = {&#39;a&#39;: True, &#39;b&#39;: False}</span>
+<span class="sd">    &gt;&gt;&gt; y = {&#39;b&#39;: True, &#39;c&#39;: False}</span>
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op_with_forced_defaults(x, y, and_, True, True)</span>
+<span class="sd">    {&#39;a&#39;: True, &#39;b&#39;: False, &#39;c&#39;: False}</span>
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op_with_forced_defaults(x, y, or_, True, True)</span>
+<span class="sd">    {&#39;a&#39;: True, &#39;b&#39;: True, &#39;c&#39;: True}</span>
+<span class="sd">    &gt;&gt;&gt; key_aligned_val_op_with_forced_defaults(x, y, xor, True, True)</span>
+<span class="sd">    {&#39;a&#39;: False, &#39;b&#39;: True, &#39;c&#39;: True}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result_dict</span> <span class="o">=</span> <span class="n">empty_mapping_factory</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v1</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dflt_val_for_y</span><span class="p">)</span>
+        <span class="n">result_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">result_dict</span><span class="p">):</span>
+        <span class="n">result_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">dflt_val_for_x</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">result_dict</span></div>
+
+
+<div class="viewcode-block" id="map_op_val"><a class="viewcode-back" href="../../module_docs/linkup/base.html#linkup.base.map_op_val">[docs]</a><span class="k">def</span> <span class="nf">map_op_val</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">BinaryOp</span><span class="p">,</span> <span class="n">items_to_mapping</span><span class="o">=</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Apply operation op(v, val) to every value v of mapping x.</span>
+
+<span class="sd">    &gt;&gt;&gt; from operator import add, sub, mul, truediv</span>
+<span class="sd">    &gt;&gt;&gt; x = dict(a=2, b=3)</span>
+<span class="sd">    &gt;&gt;&gt; map_op_val(x, 2, add)</span>
+<span class="sd">    {&#39;a&#39;: 4, &#39;b&#39;: 5}</span>
+<span class="sd">    &gt;&gt;&gt; map_op_val(x, 2, sub)</span>
+<span class="sd">    {&#39;a&#39;: 0, &#39;b&#39;: 1}</span>
+<span class="sd">    &gt;&gt;&gt; map_op_val(x, 2, mul)</span>
+<span class="sd">    {&#39;a&#39;: 4, &#39;b&#39;: 6}</span>
+<span class="sd">    &gt;&gt;&gt; map_op_val(x, 2, truediv)</span>
+<span class="sd">    {&#39;a&#39;: 1.0, &#39;b&#39;: 1.5}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">items_to_mapping</span><span class="p">(((</span><span class="n">k</span><span class="p">,</span> <span class="n">op</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="OperableMapping"><a class="viewcode-back" href="../../module_docs/linkup/base.html#linkup.base.OperableMapping">[docs]</a><span class="k">class</span> <span class="nc">OperableMapping</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; d = OperableMapping({&#39;a&#39;: 8, &#39;b&#39;: 4})</span>
+<span class="sd">    &gt;&gt;&gt; dd = OperableMapping(b=2, c=1)  # you can make one this way too</span>
+<span class="sd">    &gt;&gt;&gt; d + dd</span>
+<span class="sd">    {&#39;a&#39;: 8, &#39;b&#39;: 6, &#39;c&#39;: 1}</span>
+<span class="sd">    &gt;&gt;&gt; d - dd</span>
+<span class="sd">    {&#39;a&#39;: 8, &#39;b&#39;: 2, &#39;c&#39;: -1}</span>
+<span class="sd">    &gt;&gt;&gt; d * dd</span>
+<span class="sd">    {&#39;a&#39;: 8, &#39;b&#39;: 8, &#39;c&#39;: 1}</span>
+<span class="sd">    &gt;&gt;&gt; d / dd</span>
+<span class="sd">    {&#39;a&#39;: 8.0, &#39;b&#39;: 2.0, &#39;c&#39;: 1.0}</span>
+
+<span class="sd">    The result of the operations are themselves DictWithOps, so you can compose several.</span>
+
+<span class="sd">    &gt;&gt;&gt; d * (dd + d) / d  # notice that this is equivalent to d + dd (but with numbers cast to floats)</span>
+<span class="sd">    {&#39;a&#39;: 8.0, &#39;b&#39;: 6.0, &#39;c&#39;: 1.0}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__add__</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="vm">__class__</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">map_op_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__add__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="vm">__class__</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">map_op_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="vm">__class__</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">map_op_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__truediv__</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="vm">__class__</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">map_op_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="fm">__truediv__</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">linkup</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/linkup.html">linkup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/linkup/base.html">linkup.base</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;NO COPYRIGHT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
