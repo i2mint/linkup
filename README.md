@@ -10,7 +10,7 @@ But if you want to (and can) be light on your feet, this is the package for you.
 
 To install:	```pip install linkup```
 
-# Examples
+# Operable Mappings
 
 ## OperableMapping
 
@@ -43,6 +43,26 @@ You can also use values (which will have the effect of being broadcast to all va
 >>> d * 10
 {'a': 80, 'b': 40}
 ```
+
+## OperableMappingNoDflts
+
+
+```pydocstring
+>>> from linkup.base import *
+>>> d = OperableMappingNoDflts({'a': 8, 'b': 4, 'c': 3})
+>>> dd = OperableMappingNoDflts(b=2, c=1, d=0)  # you can make one this way too
+>>>
+>>> d + 1
+{'a': 9, 'b': 5, 'c': 4}
+>>> d / dd
+{'b': 2.0, 'c': 3.0}
+>>> (d + 1) / dd
+{'b': 2.5, 'c': 4.0}
+```
+
+    
+
+# Functions
 
 If you don't need to create operable instances, you can just use a function instead. 
 It's what OperableMapping uses behind the scenes, so will be faster if you use it directly

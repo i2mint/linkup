@@ -4,6 +4,8 @@ Base functions and classes for linked/joined operations.
 
 from typing import Mapping, Callable, Union, MutableMapping, Any
 import operator
+from inspect import signature
+from functools import partialmethod
 
 EmptyMappingFactory = Union[MutableMapping, Callable[[], MutableMapping]]
 BinaryOp = Callable[[Any, Any], Any]
@@ -17,9 +19,10 @@ def key_aligned_val_op(
     op: BinaryOp,
     dflt_val_for_x=Neutral,
     dflt_val_for_y=Neutral,
+    empty_mapping_factory: EmptyMappingFactory = dict,
 ):
     """
-    
+
     >>> from operator import add, sub, mul, truediv, and_, or_, xor
     >>> x = {'a': 8, 'b': 4}
     >>> y = {'b': 2, 'c': 1}
@@ -41,7 +44,7 @@ def key_aligned_val_op(
 
 
     """
-    result_dict = dict()
+    result_dict = empty_mapping_factory()
     for k, v1 in x.items():
         v2 = y.get(k, dflt_val_for_y)
         if v2 is not Neutral:
@@ -121,6 +124,36 @@ def map_op_val(x: Mapping, val, op: BinaryOp, items_to_mapping=dict):
     return items_to_mapping(((k, op(v, val)) for k, v in x.items()))
 
 
+startswith_dunder = lambda x: x.startswith("__")
+
+
+def gen_attrname_func_for_module(module, name_filter=startswith_dunder):
+    module_obj_names_that_are_particular_to_module = set(dir(module)) - set(
+        dir(dict)
+    )
+    module_obj_names = filter(
+        name_filter, module_obj_names_that_are_particular_to_module
+    )
+    for name in module_obj_names:
+        func = getattr(module, name)
+        if callable(func):
+            yield name, func
+
+
+operator_name_funcs_1 = set(
+    filter(
+        lambda name_func: len(signature(name_func[1]).parameters) == 1,
+        gen_attrname_func_for_module(operator),
+    )
+)
+operator_name_funcs_2 = set(
+    filter(
+        lambda name_func: len(signature(name_func[1]).parameters) == 2,
+        gen_attrname_func_for_module(operator),
+    )
+)
+
+
 class OperableMapping(dict):
     """
     >>> d = OperableMapping({'a': 8, 'b': 4})
@@ -179,3 +212,45 @@ class OperableMapping(dict):
             )
         else:
             return map_op_val(self, y, operator.__truediv__)
+
+
+# TODO: Inject the methods inside the class itself?
+class OperableMappingNoDflts(dict):
+    """OperableMapping with ALL operators of operator module (but without defaults)
+
+    >>> from linkup.base import *
+    >>> d = OperableMappingNoDflts({'a': 8, 'b': 4, 'c': 3})
+    >>> dd = OperableMappingNoDflts(b=2, c=1, d=0)  # you can make one this way too
+    >>>
+    >>> d + 1
+    {'a': 9, 'b': 5, 'c': 4}
+    >>> d / dd
+    {'b': 2.0, 'c': 3.0}
+    >>> (d + 1) / dd
+    {'b': 2.5, 'c': 4.0}
+    """
+
+
+def _binary_operator_method_template(self, y, op, factory):
+    """"""
+    if isinstance(y, Mapping):
+        return key_aligned_val_op(self, y, op, empty_mapping_factory=factory)
+    else:
+        return map_op_val(self, y, op, factory)
+
+
+# TODO: Make unary tools and inject to OperableMappingNoDflts
+# for name, func in operator_name_funcs_1:
+#     setattr(OperableMappingNoDflts, name, partialmethod(_binary_operator_method_template,
+#                                                         op=func, factory=OperableMappingNoDflts))
+
+for name, func in operator_name_funcs_2:
+    setattr(
+        OperableMappingNoDflts,
+        name,
+        partialmethod(
+            _binary_operator_method_template,
+            op=func,
+            factory=OperableMappingNoDflts,
+        ),
+    )
