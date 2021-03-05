@@ -2,9 +2,13 @@
 # linkup
 Making mappings operable.
 
+Note: This package takes no dependencies. Pure builtin python. 
+
+If you're going to operate with large amounts of data, and can afford more computational resources, 
+you may want to compare to using `pandas.Series`. 
+But if you want to (and can) be light on your feet, this is the package for you. 
 
 To install:	```pip install linkup```
-
 
 # Examples
 

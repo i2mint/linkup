@@ -138,6 +138,13 @@ class OperableMapping(dict):
     >>> d * (dd + d) / d  # notice that this is equivalent to d + dd (but with numbers cast to floats)
     {'a': 8.0, 'b': 6.0, 'c': 1.0}
 
+    You can also use values (which will have the effect of being broadcast to all values of the mapping.
+
+    >>> d + 1
+    {'a': 9, 'b': 5}
+    >>> d * 10
+    {'a': 80, 'b': 40}
+
     """
 
     def __add__(self, y):
