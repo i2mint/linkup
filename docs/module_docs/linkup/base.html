@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>linkup.base &#8212; linkup 0.1.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="linkup" href="../linkup.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-linkup.base">
+<span id="linkup-base"></span><h1>linkup.base<a class="headerlink" href="#module-linkup.base" title="Permalink to this headline">¶</a></h1>
+<p>Base functions and classes for linked/joined operations.</p>
+<dl class="py class">
+<dt id="linkup.base.OperableMapping">
+<em class="property">class </em><code class="sig-prename descclassname">linkup.base.</code><code class="sig-name descname">OperableMapping</code><a class="reference internal" href="../../_modules/linkup/base.html#OperableMapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linkup.base.OperableMapping" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">OperableMapping</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dd</span> <span class="o">=</span> <span class="n">OperableMapping</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># you can make one this way too</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">+</span> <span class="n">dd</span>
+<span class="go">{&#39;a&#39;: 8, &#39;b&#39;: 6, &#39;c&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">-</span> <span class="n">dd</span>
+<span class="go">{&#39;a&#39;: 8, &#39;b&#39;: 2, &#39;c&#39;: -1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">*</span> <span class="n">dd</span>
+<span class="go">{&#39;a&#39;: 8, &#39;b&#39;: 8, &#39;c&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">/</span> <span class="n">dd</span>
+<span class="go">{&#39;a&#39;: 8.0, &#39;b&#39;: 2.0, &#39;c&#39;: 1.0}</span>
+</pre></div>
+</div>
+<p>The result of the operations are themselves DictWithOps, so you can compose several.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">dd</span> <span class="o">+</span> <span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>  <span class="c1"># notice that this is equivalent to d + dd (but with numbers cast to floats)</span>
+<span class="go">{&#39;a&#39;: 8.0, &#39;b&#39;: 6.0, &#39;c&#39;: 1.0}</span>
+</pre></div>
+</div>
+<p>You can also use values (which will have the effect of being broadcast to all values of the mapping.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="go">{&#39;a&#39;: 9, &#39;b&#39;: 5}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">*</span> <span class="mi">10</span>
+<span class="go">{&#39;a&#39;: 80, &#39;b&#39;: 40}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="linkup.base.key_aligned_val_op">
+<code class="sig-prename descclassname">linkup.base.</code><code class="sig-name descname">key_aligned_val_op</code><span class="sig-paren">(</span><em class="sig-param">x: Mapping, y: Mapping, op: Callable[[Any, Any], Any], dflt_val_for_x=&lt;object object&gt;, dflt_val_for_y=&lt;object object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/linkup/base.html#key_aligned_val_op"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linkup.base.key_aligned_val_op" title="Permalink to this definition">¶</a></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">add</span><span class="p">,</span> <span class="n">sub</span><span class="p">,</span> <span class="n">mul</span><span class="p">,</span> <span class="n">truediv</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span> <span class="n">or_</span><span class="p">,</span> <span class="n">xor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>If no default vals are given, only those keys that are in both mappings will be in the output.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">add</span><span class="p">)</span>
+<span class="go">{&#39;b&#39;: 6}</span>
+</pre></div>
+</div>
+<p>If we specify a default for <code class="docutils literal notranslate"><span class="pre">x</span></code> then all items of <code class="docutils literal notranslate"><span class="pre">y</span></code> can be used.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="n">dflt_val_for_x</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">{&#39;b&#39;: 6, &#39;c&#39;: 1}</span>
+</pre></div>
+</div>
+<p>If we specify a default for <code class="docutils literal notranslate"><span class="pre">y</span></code> then all items of <code class="docutils literal notranslate"><span class="pre">x</span></code> can be used.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="n">dflt_val_for_y</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 8, &#39;b&#39;: 6}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="linkup.base.key_aligned_val_op_with_forced_defaults">
+<code class="sig-prename descclassname">linkup.base.</code><code class="sig-name descname">key_aligned_val_op_with_forced_defaults</code><span class="sig-paren">(</span><em class="sig-param">x: Mapping, y: Mapping, op: Callable[[Any, Any], Any], dflt_val_for_x, dflt_val_for_y, empty_mapping_factory: Union[MutableMapping, Callable[[], MutableMapping]] = &lt;class 'dict'&gt;</em><span class="sig-paren">)</span> &#x2192; Mapping<a class="reference internal" href="../../_modules/linkup/base.html#key_aligned_val_op_with_forced_defaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linkup.base.key_aligned_val_op_with_forced_defaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply an operator to the key-aligned values of two dictionaries, using specified defaults for each dictionary.</p>
+<p>The output’s keys will be the union of the keys of the input dictionaries.</p>
+<p>The type of the output will be the type of that is returned by empty_mapping_factory.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">add</span><span class="p">,</span> <span class="n">sub</span><span class="p">,</span> <span class="n">mul</span><span class="p">,</span> <span class="n">truediv</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span> <span class="n">or_</span><span class="p">,</span> <span class="n">xor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 8, &#39;b&#39;: 6, &#39;c&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sub</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 8, &#39;b&#39;: 2, &#39;c&#39;: -1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mul</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 8, &#39;b&#39;: 8, &#39;c&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">truediv</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 8.0, &#39;b&#39;: 2.0, &#39;c&#39;: 1.0}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[])</span>
+<span class="go">{&#39;a&#39;: [8], &#39;b&#39;: [4, 2], &#39;c&#39;: [1]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">and_</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: True, &#39;b&#39;: False, &#39;c&#39;: False}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">or_</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: True, &#39;b&#39;: True, &#39;c&#39;: True}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key_aligned_val_op_with_forced_defaults</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xor</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: False, &#39;b&#39;: True, &#39;c&#39;: True}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="linkup.base.map_op_val">
+<code class="sig-prename descclassname">linkup.base.</code><code class="sig-name descname">map_op_val</code><span class="sig-paren">(</span><em class="sig-param">x: Mapping, val, op: Callable[[Any, Any], Any], items_to_mapping=&lt;class 'dict'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/linkup/base.html#map_op_val"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#linkup.base.map_op_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply operation op(v, val) to every value v of mapping x.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">add</span><span class="p">,</span> <span class="n">sub</span><span class="p">,</span> <span class="n">mul</span><span class="p">,</span> <span class="n">truediv</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">map_op_val</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">add</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 4, &#39;b&#39;: 5}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">map_op_val</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sub</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 0, &#39;b&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">map_op_val</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">mul</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 4, &#39;b&#39;: 6}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">map_op_val</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">truediv</span><span class="p">)</span>
+<span class="go">{&#39;a&#39;: 1.0, &#39;b&#39;: 1.5}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">linkup</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../linkup.html">linkup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">linkup.base</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../linkup.html" title="previous chapter">linkup</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;NO COPYRIGHT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/module_docs/linkup/base.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
