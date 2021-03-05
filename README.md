@@ -35,6 +35,15 @@ The result of the operations are themselves DictWithOps, so you can compose seve
 {'a': 8.0, 'b': 6.0, 'c': 1.0}
 ```
 
+You can also use values (which will have the effect of being broadcast to all values of the mapping.
+
+```pydocstring
+>>> d + 1
+{'a': 9, 'b': 5}
+>>> d * 10
+{'a': 80, 'b': 40}
+```
+
 If you don't need to create operable instances, you can just use a function instead. 
 It's what OperableMapping uses behind the scenes, so will be faster if you use it directly
 (but look less elegantly mathematical in your code).
