@@ -124,13 +124,11 @@ def map_op_val(x: Mapping, val, op: BinaryOp, items_to_mapping=dict):
     return items_to_mapping(((k, op(v, val)) for k, v in x.items()))
 
 
-startswith_dunder = lambda x: x.startswith("__")
+startswith_dunder = lambda x: x.startswith('__')
 
 
 def gen_attrname_func_for_module(module, name_filter=startswith_dunder):
-    module_obj_names_that_are_particular_to_module = set(dir(module)) - set(
-        dir(dict)
-    )
+    module_obj_names_that_are_particular_to_module = set(dir(module)) - set(dir(dict))
     module_obj_names = filter(
         name_filter, module_obj_names_that_are_particular_to_module
     )
@@ -249,8 +247,6 @@ for name, func in operator_name_funcs_2:
         OperableMappingNoDflts,
         name,
         partialmethod(
-            _binary_operator_method_template,
-            op=func,
-            factory=OperableMappingNoDflts,
+            _binary_operator_method_template, op=func, factory=OperableMappingNoDflts,
         ),
     )
