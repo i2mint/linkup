@@ -2,7 +2,8 @@
 Base functions and classes for linked/joined operations.
 """
 
-from typing import Mapping, Callable, Union, MutableMapping, Any
+from typing import Union, Any
+from collections.abc import Mapping, Callable, MutableMapping
 import operator
 from inspect import signature
 from functools import partialmethod
