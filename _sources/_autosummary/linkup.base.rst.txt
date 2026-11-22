@@ -1,0 +1,23 @@
+linkup.base
+===========
+
+.. automodule:: linkup.base
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      gen_attrname_func_for_module
+      key_aligned_val_op
+      key_aligned_val_op_with_forced_defaults
+      map_op_val
+      startswith_dunder
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      OperableMapping
+      OperableMappingNoDflts
+   

@@ -1,0 +1,13 @@
+# linkup
+
+> Making mappings operable.
+
+
+## Pages in this subsection
+
+- [linkup](linkup.html.md): Operating on values of mappings (by default, dictionaries) while keeping keys aligned
+- [linkup.base](linkup.base.html.md): Base functions and classes for linked/joined operations.
+
+## Optional
+
+- [Top-level llms.txt](../llms.txt): Complete documentation index.

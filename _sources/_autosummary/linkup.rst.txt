@@ -1,0 +1,13 @@
+﻿linkup
+======
+
+.. automodule:: linkup
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   base

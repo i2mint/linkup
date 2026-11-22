@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "built_at": "2026-11-22T22:32:06Z",
+  "package": {
+    "name": "linkup",
+    "version": "0.1.4",
+    "display_name": "linkup",
+    "source": "pyproject.toml"
+  },
+  "git": {
+    "available": true,
+    "commit": "6d72d47e1b2ef248a1ad3f0782e50911bbfe8acf",
+    "short_commit": "6d72d47",
+    "branch": "master",
+    "tags": [],
+    "dirty": false,
+    "remote_url": "https://github.com/i2mint/linkup",
+    "commit_url": "https://github.com/i2mint/linkup/commit/6d72d47e1b2ef248a1ad3f0782e50911bbfe8acf",
+    "error": null
+  },
+  "ci": {
+    "provider": "github",
+    "repository": "i2mint/linkup",
+    "sha": "6d72d47e1b2ef248a1ad3f0782e50911bbfe8acf",
+    "sha_in_history": true,
+    "ref": "refs/heads/master",
+    "ref_name": "master",
+    "run_id": "45078118173",
+    "run_url": "https://github.com/i2mint/linkup/actions/runs/45078118173",
+    "server_url": "https://github.com"
+  },
+  "tools": {
+    "epythet": "0.2.23",
+    "sphinx": "9.1.1",
+    "docutils": "0.22.4",
+    "python": "3.12.16"
+  },
+  "config": {
+    "theme": "auto",
+    "html_theme": "furo",
+    "accent": "#8f3254",
+    "mode": "auto",
+    "api_generator": "autosummary",
+    "ignore": [
+      "tests/",
+      "scrap/",
+      "examples/"
+    ],
+    "agent_outputs": true,
+    "aggregates": [
+      "md"
+    ],
+    "ai_artifacts": true,
+    "provenance": true,
+    "docs_dir": "docsrc"
+  },
+  "site": {
+    "modules_documented": 2,
+    "objects_documented": 5
+  },
+  "pypi": {
+    "checked": true,
+    "latest": "0.1.4",
+    "relation": "same",
+    "error": null
+  },
+  "reproduce": "git clone https://github.com/i2mint/linkup && cd linkup\ngit checkout 6d72d47e1b2ef248a1ad3f0782e50911bbfe8acf\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "warnings": [],
+  "alignment": {
+    "aligned": true,
+    "notes": []
+  }
+}

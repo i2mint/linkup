@@ -1,4 +1,0 @@
-linkup
-======
-.. automodule:: linkup
-   :members:
